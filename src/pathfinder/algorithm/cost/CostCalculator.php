@@ -16,17 +16,17 @@ abstract class CostCalculator {
     protected function register(Block $block, int $cost, bool $allStates = true): void {
         if($allStates) {
             for($meta = 0; $meta <= 15; $meta++) {
-                $fullId = ($block->getId() << Block::INTERNAL_METADATA_BITS) | $meta;
+                $fullId = ($block->getTypeId() << Block::INTERNAL_STATE_DATA_BITS) | $meta;
                 self::$BLOCK_COSTS[$fullId] = $cost;
             }
             return;
         }
-        self::$BLOCK_COSTS[$block->getFullId()] = $cost;
+        self::$BLOCK_COSTS[$block->getStateId()] = $cost;
     }
 
     protected static array $BLOCK_COSTS = [];
 
     public static function getCost(Block $block): int {
-        return self::$BLOCK_COSTS[$block->getFullId()] ?? 1;
+        return self::$BLOCK_COSTS[$block->getStateId()] ?? 1;
     }
 }
