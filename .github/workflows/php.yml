@@ -2,41 +2,67 @@ name: PHP Composer
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - master
   pull_request:
-    branches: [ "master" ]
-
-permissions:
-  contents: read
 
 jobs:
-  build:
+  build-php:
+    name: Prepare PHP
+    runs-on: ${{ matrix.image }}
 
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image:
+          - ubuntu-20.04
+        php:
+          - 8.2.1
 
     steps:
-    - uses: actions/checkout@v3
+      - name: Build and prepare PHP cache
+        uses: pmmp/setup-php-action@4d1b890176aa299211f4ccae76ddbf9bd008bbd6
+        with:
+          php-version: ${{ matrix.php }}
+          install-path: "./bin"
+          pm-version-major: "4"
 
-    - name: Update composer
-      run: composer update --ignore-platform-req=ext-*
 
-    - name: Validate composer.json and composer.lock
-      run: composer validate --strict
+  phpstan:
+    name: PHPStan analysis
+    needs: build-php
+    runs-on: ${{ matrix.image }}
 
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v3
-      with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-
+    strategy:
+      matrix:
+        image:
+          - ubuntu-20.04
+        php:
+          - 8.2.1
 
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
+    steps:
+      - uses: actions/checkout@v3
 
-    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
-    # Docs: https://getcomposer.org/doc/articles/scripts.md
+      - name: Setup PHP
+        uses: pmmp/setup-php-action@4d1b890176aa299211f4ccae76ddbf9bd008bbd6
+        with:
+          php-version: ${{ matrix.php }}
+          install-path: "./bin"
+          pm-version-major: "4"
 
-    # - name: Run test suite
-    #   run: composer run-script test
+      - name: Install Composer
+        run: curl -sS https://getcomposer.org/installer | php
+
+      - name: Restore Composer package cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/composer/files
+            ~/.cache/composer/vcs
+          key: "composer-v2-cache-${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}"
+          restore-keys: |
+            composer-v2-cache-
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction
+
+      - name: Analyze with PHPStan
+        run: ./vendor/bin/phpstan analyze --no-progress --memory-limit=2G
