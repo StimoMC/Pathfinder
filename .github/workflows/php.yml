@@ -30,13 +30,3 @@ jobs:
           echo ::set-output name=NAME::$(php -r 'echo yaml_parse_file(getcwd() . DIRECTORY_SEPARATOR .                                                 "plugin.yml")["name"];')
       - name: "Build phar"
         run: "php -dphar.readonly=0 build.php"
-
-      - name: "Create Release"
-        uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ steps.metadata.outputs.VERSION }}"
-          prerelease: false
-          title: "Release v${{ steps.metadata.outputs.VERSION }}"
-          files: |
-            out/*.phar
