@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace pathfinder;
 
 use pathfinder\command\PathfinderCommand;
-use pathfinder\entity\TestEntity;
+use pathfinder\entity\PlayerEntity;
 use pocketmine\entity\EntityDataHelper;
 use pocketmine\entity\EntityFactory;
 use pocketmine\nbt\tag\CompoundTag;
@@ -22,8 +22,8 @@ class Pathfinder extends PluginBase {
 
         Server::getInstance()->getCommandMap()->register("pathfinder", new PathfinderCommand());
 
-        EntityFactory::getInstance()->register(TestEntity::class, function(World $world, CompoundTag $nbt) : TestEntity{
-            return new TestEntity(EntityDataHelper::parseLocation($nbt, $world), $nbt);
-        }, ["TestEntity"]);
+        EntityFactory::getInstance()->register(PlayerEntity::class, function(World $world, CompoundTag $nbt) : PlayerEntity{
+            return new PlayerEntity(EntityDataHelper::parseLocation($nbt, $world), $nbt);
+        }, ["PlayerEntity"]);
     }
 }

@@ -7,7 +7,7 @@ namespace pathfinder\command;
 use pathfinder\algorithm\AlgorithmSettings;
 use pathfinder\algorithm\astar\AStar;
 use pathfinder\algorithm\path\PathResult;
-use pathfinder\entity\TestEntity;
+use pathfinder\entity\PlayerEntity;
 use pathfinder\Pathfinder;
 use pocketmine\block\Block;
 use pocketmine\block\utils\DyeColor;
@@ -96,7 +96,7 @@ class PathfinderCommand extends Command {
                 break;
             }
             case "entity": {
-                $entity = new TestEntity($player->getLocation());
+                $entity = new PlayerEntity($player->getLocation());
                 $entity->spawnToAll();
                 break;
             }

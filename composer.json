@@ -9,6 +9,6 @@
     "license": "GPL-2.0-or-later",
     "require": {},
     "require-dev": {
-        "pocketmine/pocketmine-mp": "5.0.0-BETA1"
+        "pocketmine/pocketmine-mp": "^5"
     }
 }
